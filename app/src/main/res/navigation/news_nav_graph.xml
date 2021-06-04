@@ -49,5 +49,9 @@
         app1:enterAnim="@anim/slide_in_left"
         app1:exitAnim="@anim/slide_in_right"
         app1:popEnterAnim="@anim/slide_in_right"
-        app1:popExitAnim="@anim/slide_out_right" />
+        app1:popExitAnim="@anim/slide_out_right" >
+        <argument
+            android:name="Article"
+            app1:argType="com.app.dailynewsapp.models.Article" />
+    </fragment>
 </navigation>

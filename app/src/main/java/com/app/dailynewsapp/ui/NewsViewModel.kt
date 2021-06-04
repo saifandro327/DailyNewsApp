@@ -3,6 +3,7 @@ package com.app.dailynewsapp.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.app.dailynewsapp.models.Article
 import com.app.dailynewsapp.models.NewsResponse
 import com.app.dailynewsapp.repository.NewsRepository
 import com.app.dailynewsapp.util.Resource
@@ -15,6 +16,8 @@ class NewsViewModel(
 ) :  ViewModel() {
     val breakingNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
     var breakingNewsPage = 1
+    val searchNews:MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
+    var searchNewsPage =1
 init {
     getBreakingNews("us")
 }
@@ -22,6 +25,12 @@ init {
         breakingNews.postValue(Resource.Loading())
         val response = newsRepository.getBreakingNews(countryCode, breakingNewsPage)
     breakingNews.postValue(handleBreakingNewsResponse(response ))
+    }
+
+    fun searchNEws(searchQuery:String)=viewModelScope.launch {
+        searchNews.postValue((Resource.Loading()))
+        val response=newsRepository.searchNews(searchQuery,searchNewsPage)
+        searchNews.postValue(handleSearchNewsResponse(response))
     }
 
     private fun handleBreakingNewsResponse(response: Response<NewsResponse>): Resource<NewsResponse> {
@@ -33,4 +42,23 @@ init {
         }
         return Resource.Error(response.message())
     }
+
+    private fun handleSearchNewsResponse(response: Response<NewsResponse>): Resource<NewsResponse> {
+        if (response.isSuccessful) {
+            response.body()?.let { resultResponse ->
+                return Resource.Success(resultResponse)
+
+            }
+        }
+        return Resource.Error(response.message())
+    }
+    fun saveArticle(article: Article)=viewModelScope.launch {
+        newsRepository.upsert(article)
+    }
+    fun getsavedNews()=newsRepository.getSavedNews()
+    fun deleteArticle(article: Article)=viewModelScope.launch {
+        newsRepository.deleteArticle(article)
+
+    }
+
 }
